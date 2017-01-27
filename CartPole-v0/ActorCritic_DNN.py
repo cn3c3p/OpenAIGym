@@ -35,9 +35,10 @@ class ActorCriticDNN(module.ActorCriticDNN):
 	def __init__(self,
 				 actor_layers, critic_layers,
 				 num_action_output, num_features,
+				 mode='stochastic',
 				 actor_exploration = 0.9,
 				 update_num=5,
-				 batch_size=64,
+				 batch_size=128,
 				 discount_factor=0.9):
 		module.ActorCriticDNN.__init__(self,
 										actor_layers,
@@ -50,7 +51,8 @@ class ActorCriticDNN(module.ActorCriticDNN):
 									   	update_num=update_num,
 									   	batch_size=batch_size,
 									   	discount_factor=discount_factor,
-									   	max_iter=12000)
+									   	max_iter=30000)
+		self.mode = mode
 
 	def explore_action(self, action, action_space):
 		# Randomly choose an action.
@@ -59,7 +61,11 @@ class ActorCriticDNN(module.ActorCriticDNN):
 
 	def prepare_action_for_env(self, action):
 		# Just guessing for now
-		action = np.random.choice(range(0, self.num_action_output), p=action)
+		if self.mode == 'stochastic':
+			action = np.random.choice(range(0, self.num_action_output), p=action)
+		else:
+			action = np.argmax(action)
+		#action = np.argmax(action)
 		return action
 
 	def prepare_action_for_training(self, action):

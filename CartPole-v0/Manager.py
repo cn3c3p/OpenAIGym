@@ -1,4 +1,5 @@
 import gym
+from gym import wrappers
 import numpy as np
 import matplotlib.pyplot as plt
 import time
@@ -7,7 +8,7 @@ import ActorCritic_DNN as ac
 
 if __name__ == '__main__':
 	env = gym.make('CartPole-v0')
-
+	env = wrappers.Monitor(env, './CartPole-v0-exp')
 	target_network = ac.ActorCriticDNN(
 		actor_layers=[32, 32, 32],
 		critic_layers=[32, 32, 32],
@@ -31,7 +32,7 @@ if __name__ == '__main__':
 
 	rewards = list()
 	final_form = False
-	for i_episode in range(0, 5000):
+	for i_episode in range(0, 600):
 		curr_obs = env.reset()
 		done = False
 		print('===========>New Episode<==========')
@@ -66,6 +67,7 @@ if __name__ == '__main__':
 		if np.mean(rewards) > 195.0:
 			# Fix the agent.
 			final_form = True
+			target_network.mode = 'max'
 		plt.scatter(x=i_episode, y=cum_reward, c='b', alpha=0.6)
 		plt.pause(0.01)
 	plt.waitforbuttonpress()
