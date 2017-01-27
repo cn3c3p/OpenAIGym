@@ -36,8 +36,8 @@ class ActorCriticDNN(module.ActorCriticDNN):
 				 actor_layers, critic_layers,
 				 num_action_output, num_features,
 				 actor_exploration = 0.9,
-				 update_num=32,
-				 batch_size=32,
+				 update_num=5,
+				 batch_size=64,
 				 discount_factor=0.9):
 		module.ActorCriticDNN.__init__(self,
 										actor_layers,
@@ -50,7 +50,7 @@ class ActorCriticDNN(module.ActorCriticDNN):
 									   	update_num=update_num,
 									   	batch_size=batch_size,
 									   	discount_factor=discount_factor,
-									   	max_iter=5000)
+									   	max_iter=12000)
 
 	def explore_action(self, action, action_space):
 		# Randomly choose an action.

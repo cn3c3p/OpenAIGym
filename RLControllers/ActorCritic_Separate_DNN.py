@@ -268,6 +268,11 @@ class ActorCriticDNN:
 		value = prediction[0]
 		return value
 
+	def final_action(self, s):
+		action = self.evaluate_action(s)
+		action = self.prepare_action_for_env(action)
+		return action
+
 	def copy_params(self, other_network):
 		self.critic.set_weights(other_network.critic.get_weights())
 		self.actor.set_weights(other_network.actor.get_weights())
