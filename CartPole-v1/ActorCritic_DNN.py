@@ -37,9 +37,11 @@ class ActorCriticDNN(module.ActorCriticDNN):
 				 num_action_output, num_features,
 				 mode='stochastic',
 				 actor_exploration = 0.9,
-				 update_num=5,
-				 batch_size=128,
-				 discount_factor=0.9):
+				 update_num=3,
+				 batch_size=256,
+				 discount_factor=0.9,
+				 load_actor_model=None,
+				 load_critic_model=None):
 		module.ActorCriticDNN.__init__(self,
 										actor_layers,
 									   	critic_layers,
@@ -51,9 +53,12 @@ class ActorCriticDNN(module.ActorCriticDNN):
 									   	update_num=update_num,
 									   	batch_size=batch_size,
 									   	discount_factor=discount_factor,
-										actor_buffer_len = 10000,
-									   	critic_buffer_len = 10000,
-									   	max_iter=20000)
+										actor_buffer_len = 500,
+									   	critic_buffer_len = 500,
+									   	max_iter=140000,
+									   	load_actor_model=load_actor_model,
+									   	load_critic_model=load_critic_model)
+
 		self.mode = mode
 
 	def explore_action(self, action, action_space):

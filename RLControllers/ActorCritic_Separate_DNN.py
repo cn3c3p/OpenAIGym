@@ -1,7 +1,7 @@
 import time
 from keras.layers import Input
 from keras.layers.core import Dense, Dropout
-from keras.models import Model, Sequential
+from keras.models import Model, Sequential, load_model
 
 import math
 import numpy as np
@@ -16,6 +16,9 @@ class ActorCriticDNN:
 
 	iterations = 0
 
+	critic = None
+	actor = None
+
 	def __init__(self,
 				 actor_layers, critic_layers,
 				 num_action_output,
@@ -28,7 +31,11 @@ class ActorCriticDNN:
 				 update_num=32,
 				 batch_size=32,
 				 discount_factor=0.9,
-				 max_iter=10000000):
+				 actor_buffer_len=50000,
+				 critic_buffer_len=50000,
+				 max_iter=10000000,
+				 load_critic_model=None,
+				 load_actor_model=None):
 
 		self.update_num = update_num
 		self.batch_size = batch_size
@@ -38,81 +45,85 @@ class ActorCriticDNN:
 		self.init_exp = actor_exploration
 		self.max_iter = max_iter
 		self.iterations = 0
+		self.actor_buffer_len = actor_buffer_len
+		self.critic_buffer_len = critic_buffer_len
 
-		self.critic = Sequential()
-		self.actor = Sequential()
+		if load_actor_model:
+			print('Load actor')
+			self.actor = load_model(load_actor_model)
+		if load_critic_model:
+			print('load critic')
+			self.critic = load_model(load_critic_model)
 
-		# Critic Network
-
-		self.critic.add(
-			Dense(
-				output_dim=critic_layers[0],
-				input_dim=num_features
-			)
-		)
-
-		for critic_layer in critic_layers[1:]:
+		if not self.critic:
+			self.critic = Sequential()
+			# Critic Network
 
 			self.critic.add(
 				Dense(
-					output_dim=critic_layer,
-					activation='relu'
+					output_dim=critic_layers[0],
+					input_dim=num_features
 				)
 			)
+
+			for critic_layer in critic_layers[1:]:
+				self.critic.add(
+					Dense(
+						output_dim=critic_layer,
+						activation='relu'
+					)
+				)
+				self.critic.add(
+					Dropout(
+						p=0.1
+					)
+				)
+
 			self.critic.add(
-				Dropout(
-					p=0.1
+				Dense(
+					output_dim=1,
+					activation=critic_activation,
+					name='critic_out'
 				)
 			)
 
-		self.critic.add(
-			Dense (
-				output_dim=1,
-				activation=critic_activation,
-				name='critic_out'
+			self.critic.compile(
+				optimizer='rmsprop',
+				loss=critic_loss
 			)
-		)
 
-		# Actor network
+		if not self.actor:
+			self.actor = Sequential()
+			# Actor network
 
-		self.actor.add(
-			Dense(
-				output_dim=actor_layers[0],
-				activation='relu',
-				input_dim=num_features
-			)
-		)
-
-		for actor_layer in actor_layers[1:]:
 			self.actor.add(
 				Dense(
-					output_dim=actor_layer,
-					activation='relu'
+					output_dim=actor_layers[0],
+					activation='relu',
+					input_dim=num_features
 				)
 			)
 
-		self.actor.add(
-			Dense (
-				output_dim=num_action_output,
-				activation=actor_activation,
-				name='actor_out'
+			for actor_layer in actor_layers[1:]:
+				self.actor.add(
+					Dense(
+						output_dim=actor_layer,
+						activation='relu'
+					)
+				)
+
+			self.actor.add(
+				Dense (
+					output_dim=num_action_output,
+					activation=actor_activation,
+					name='actor_out'
+				)
 			)
-		)
 
-
-		start = time.time()
-
-		self.actor.compile(
-			optimizer='rmsprop',
-			loss=actor_loss
-		)
-
-		self.critic.compile(
-			optimizer='rmsprop',
-			loss=critic_loss
-		)
-
-		print("Compilation Time : ", time.time() - start)
+			self.actor.compile(
+				optimizer='rmsprop',
+				loss=actor_loss
+			)
 
 		print('actor layers: ')
 		print(self.actor.summary())
@@ -156,11 +167,11 @@ class ActorCriticDNN:
 
 		if exploration:
 			self.actor_experiences.append((s, a, r, s_n))
-			if len(self.actor_experiences) > 50000:
+			if len(self.actor_experiences) > self.actor_buffer_len:
 				self.actor_experiences.pop(0)
 
 		self.critic_experiences.append((s, a, r, s_n))
-		if len(self.critic_experiences) > 50000:
+		if len(self.critic_experiences) > self.critic_buffer_len:
 			self.critic_experiences.pop(0)
 
 		self.iterations += 1
@@ -276,6 +287,11 @@ class ActorCriticDNN:
 	def copy_params(self, other_network):
 		self.critic.set_weights(other_network.critic.get_weights())
 		self.actor.set_weights(other_network.actor.get_weights())
+
+	def save(self, append):
+		self.critic.save('critic/critic-' + append + '.h5')
+		self.actor.save('actor/actor-' + append + '.h5')
+
 
 	def explore_action(self, action, action_space):
 		# TODO: Left for the subclass to implement
