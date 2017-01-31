@@ -143,7 +143,6 @@ class ActorCriticDNN:
 	def propose_action(self, s, action_space):
 
 		# Sample epsilon
-		self.iterations += 1
 		p = np.random.random()
 		action = self.evaluate_action(s)
 		under_exploration = False

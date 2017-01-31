@@ -13,7 +13,7 @@ import ActorCritic_DNN as ac
 
 if __name__ == '__main__':
 	env = gym.make('CartPole-v1')
-	env = wrappers.Monitor(env, './CartPole-v1-exp', force=True)
+	#env = wrappers.Monitor(env, './CartPole-v1-exp-Actor-Critic', force=True)
 	target_network = ac.ActorCriticDNN(
 		actor_layers=[32, 32, 32],
 		critic_layers=[32, 32, 32],
