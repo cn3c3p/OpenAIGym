@@ -9,27 +9,22 @@ import os
 # Append path to ffmpeg binary
 os.environ['PATH'] += os.pathsep + '/usr/local/bin'
 
-import ActorCritic_DNN as ac
+import Q_Learner
 
 if __name__ == '__main__':
+
 	env = gym.make('CartPole-v1')
-	#env = wrappers.Monitor(env, './CartPole-v1-exp-Actor-Critic', force=True)
-	target_network = ac.ActorCriticDNN(
-		actor_layers=[32, 32, 32],
-		critic_layers=[32, 32, 32],
-		num_action_output=2,
+	env = wrappers.Monitor(env, './CartPole-v1-exp-Q-Learner', force=True)
+	target_network = Q_Learner.Network(
+		dense_layers=[128,64,32],
 		num_features=4,
-		#load_actor_model='actor/actor-226.h5',
-		#load_critic_model='critic/critic-226.h5'
+		num_actions=2
 	)
 
-	update_network = ac.ActorCriticDNN(
-		actor_layers=[32, 32, 32],
-		critic_layers=[32, 32, 32],
-		num_action_output=2,
+	update_network = Q_Learner.Network(
+		dense_layers=[128,64,32],
 		num_features=4,
-		#load_actor_model='actor/actor-226.h5',
-		#load_critic_model='critic/critic-226.h5'
+		num_actions=2
 	)
 
 	tick = 1
@@ -85,16 +80,12 @@ if __name__ == '__main__':
 					reward = -1
 			# Add experience
 			if not final_form and not eval_mode:
-				update_network.add_experience_tuple(curr_obs, action, reward, next_obs, exploration)
+				update_network.add_experience(curr_obs, action, reward, next_obs, done)
 
 			#value = update_network.evaluate_state(curr_obs)
 			curr_obs = next_obs
 		i_episode += 1
 		rewards.append(cum_reward)
-
-		if np.mean(rewards) > max_avg_reward + 20:
-			target_network.save(str(np.mean(rewards)))
-			max_avg_reward = np.mean(rewards)
 
 		if len(rewards) > 100:
 			rewards.pop(0)

@@ -39,21 +39,14 @@ class Network(module.Network):
 								activation='linear',
 								loss='mse',
 								update_num=10,
-								batch_size=32,
+								batch_size=320,
 								discount_factor=0.9,
 								exploration=1.0,
-								experience_length=10000,
-								max_iter=100000)
+								experience_length=3000,
+								max_iter=80000)
 
 	def explore_action(self, action_space):
-		# TODO: To be implemented by subclass
-		np.choice(np.range(action_space.len))
-		pass
+		return np.random.choice(range(0, action_space.n))
 
 	def action_from_Q_values(self, q_values):
-		# TODO: To be implemented by subclass
-		pass
-
-	def prepare_action_for_training(self, action):
-		# TODO: Left for subclass to implement how to prepare action for training of network
-		pass
+		return np.argmax(q_values)

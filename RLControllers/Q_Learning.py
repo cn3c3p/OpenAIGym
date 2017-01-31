@@ -30,6 +30,7 @@ class Network():
 		self.batch_size = batch_size
 		self.discount_factor = discount_factor
 		self.init_exp = exploration
+		self.exploration = exploration
 		self.max_iter = max_iter
 		self.iterations = 0
 		self.experiences = list()
@@ -38,12 +39,13 @@ class Network():
 		self.model = Sequential()
 
 		self.model.add(
-			Input(
-				shape=(num_features,)
+			Dense (
+				output_dim=dense_layers[0],
+				input_dim=num_features
 			)
 		)
 
-		for layer in dense_layers:
+		for layer in dense_layers[1:]:
 			self.model.add(
 				Dense(
 					output_dim=layer,
@@ -80,32 +82,33 @@ class Network():
 	def propose_action(self, s, action_space):
 		p = np.random.random()
 		under_exploration = False
-		if p < self.actor_exploration:
+		if p < self.exploration:
 			under_exploration = True
 			# ===== Let subclass to implement exploration ===== #
 			action = self.explore_action(action_space)
 		else:
 			Q_values = self.evaluate_Q_values(s)
 			action = self.action_from_Q_values(q_values=Q_values)
-		# Anneal exploration factor
-		self.actor_exploration = - (self.init_exp - 0.1) * self.iterations / self.max_iter + self.init_exp
-		if self.actor_exploration < 0.1:
-			self.actor_exploration = 0.1
-		if self.iterations % 1000 == 0:
-			print('>>> Iterations: ', self.iterations)
-			print('>>> Exploration: ', self.actor_exploration)
 		return action, under_exploration
 
-	def add_experience(self, s, a, r, s_n):
-		self.experiences.append((s, a, r, s_n))
-
+	def add_experience(self, s, a, r, s_n, done):
+		self.experiences.append((s, a, r, s_n, done))
+		self.iterations += 1
+		# Anneal exploration factor
+		self.exploration = - (self.init_exp - 0.1) * self.iterations / self.max_iter + self.init_exp
+		if self.exploration < 0.1:
+			self.exploration = 0.1
 		if len(self.experiences) > self.experience_length:
 			self.experiences.pop(0)
 
-		self.iterations += 1
+		if self.iterations % 1000 == 0:
+			print('>>> Iterations: ', self.iterations)
+			print('>>> Exploration: ', self.exploration)
+
 		if self.iterations % self.update_num == 0:
 			# Train the network
-			self.update()
+			for i in range(0, 10):
+				self.update()
 
 	def update(self):
 		if len(self.experiences) > self.batch_size:
@@ -121,7 +124,7 @@ class Network():
 			if len(experiences) == 0:
 				return
 
-		states, actions, rewards, states_next = zip(*experiences)
+		states, actions, rewards, states_next, dones = zip(*experiences)
 
 		Q_curr = self.model.predict_on_batch(
 			x=np.asarray(states)
@@ -135,14 +138,20 @@ class Network():
 
 		targets = list()
 
-		for curr_val, action, reward, next_val in zip(Q_curr, actions, rewards, max_Q_next):
+		for curr_val, action, reward, next_val, done in zip(Q_curr, actions, rewards, max_Q_next, dones):
 			target = curr_val
-			target[action] = reward + self.discount_factor * next_val
+			if done:
+				target[action] = reward
+			else:
+				target[action] = reward + self.discount_factor * next_val
 			targets.append(target)
 
-		self.model.train_on_batch(
+		self.model.fit(
 			x=np.asarray(states),
-			y=np.asarray(targets)
+			y=np.asarray(targets),
+			batch_size=self.batch_size,
+			nb_epoch=1,
+			verbose=0
 		)
 
 	def evaluate_Q_values(self, s):
@@ -151,14 +160,17 @@ class Network():
 		) # Q values.
 		return Q_values
 
+	def final_action(self, s):
+		q_values = self.evaluate_Q_values(s)
+		return self.action_from_Q_values(q_values)
+
+	def copy_params(self, network):
+		self.model.set_weights(network.model.get_weights())
+
 	def explore_action(self, action_space):
 		# TODO: To be implemented by subclass
 		pass
 
 	def action_from_Q_values(self, q_values):
 		# TODO: To be implemented by subclass
-		pass
-
-	def prepare_action_for_training(self, action):
-		# TODO: Left for subclass to implement how to prepare action for training of network
 		pass
