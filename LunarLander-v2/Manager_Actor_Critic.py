@@ -54,6 +54,7 @@ if __name__ == '__main__':
 		print('===========>New Episode<==========')
 		print('episode: ' + str(i_episode))
 		cum_reward = 0
+		start_time = time.time()
 		while not done:
 
 			if i_episode % 50 == 0:
@@ -77,7 +78,7 @@ if __name__ == '__main__':
 			#action = env.action_space.sample()
 			next_obs, reward, done, info = env.step(action)
 
-			# reward /= 300
+			reward /= 100
 
 			cum_reward += reward
 
@@ -89,6 +90,13 @@ if __name__ == '__main__':
 
 			#value = update_network.evaluate_state(curr_obs)
 			curr_obs = next_obs
+			if time.time() - start_time > 60:
+				print('Stuck')
+				while not done:
+					action = 0
+					next_obs, reward, done, info = env.step(action)
+					update_network.add_experience_tuple(curr_obs, action, reward, next_obs, False)
+					curr_obs = next_obs
 		i_episode += 1
 		rewards.append(cum_reward)
 

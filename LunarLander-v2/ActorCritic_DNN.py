@@ -53,8 +53,8 @@ class ActorCriticDNN(module.ActorCriticDNN):
 									   	update_num=update_num,
 									   	batch_size=batch_size,
 									   	discount_factor=discount_factor,
-										actor_buffer_len = 10000,
-									   	critic_buffer_len = 10000,
+										actor_buffer_len = 15000,
+									   	critic_buffer_len = 30000,
 									   	max_iter=150000,
 									   	load_actor_model=load_actor_model,
 									   	load_critic_model=load_critic_model)
