@@ -74,16 +74,16 @@ class Network():
 		print('model outputs: ')
 		print(self.model.output_shape)
 
-	def propose_action(self, s, action_space):
+	def propose_action(self, s, target_model, action_space):
 		p = np.random.random()
 		under_exploration = False
 		if p < self.exploration:
 			under_exploration = True
 			# ===== Let subclass to implement exploration ===== #
-			action = self.explore_action(action_space)
+			action = target_model.explore_action(action_space)
 		else:
-			Q_values = self.evaluate_Q_values(s)
-			action = self.action_from_Q_values(q_values=Q_values)
+			Q_values = target_model.evaluate_Q_values(s)
+			action = target_model.action_from_Q_values(q_values=Q_values)
 
 		return action, under_exploration
 
