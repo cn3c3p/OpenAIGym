@@ -31,13 +31,14 @@ else:
 
 class Network(module.Network):
 
-	def __init__(self, dense_layers, num_features, num_actions, max_steps, exploration):
+	def __init__(self, dense_layers, num_features, num_actions, max_steps, exploration, target_model=None,):
 		module.Network.__init__(self,
 								dense_layers,
 								num_features,
 								num_actions,
 								exploration=exploration,
 								max_steps=max_steps,
+								target_network=target_model,
 								activation='linear',
 								loss='mse',
 								discount_factor=0.9,
