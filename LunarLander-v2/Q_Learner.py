@@ -22,36 +22,34 @@ else:
 	import imp
 
 if version == 3:
-	loader = importlib.machinery.SourceFileLoader('Q_Learning_N_Step', '../RLControllers/Q_Learning_N_Step.py')
+	loader = importlib.machinery.SourceFileLoader('Q_Learning', '../RLControllers/Q_Learning.py')
 	module = types.ModuleType(loader.name)
 	loader.exec_module(module)
 
 else:
-	module = imp.load_source('Q_Learning_N_Step', '../RLControllers/Q_Learning_N_Step.py')
+	module = imp.load_source('Q_Learning', '../RLControllers/Q_Learning.py')
 
 class Network(module.Network):
 
-	def __init__(self, dense_layers, num_features, num_actions, max_steps, exploration, target_model=None,):
+	def __init__(self, dense_layers, num_features, num_actions):
 		module.Network.__init__(self,
 								dense_layers,
 								num_features,
 								num_actions,
-								exploration=exploration,
-								max_steps=max_steps,
-								target_model=target_model,
 								activation='linear',
 								loss='mse',
+								update_num=10,
+								batch_size=512,
 								discount_factor=0.9,
-								max_iter=80000)
+								exploration=1.0,
+								experience_length=500000,
+								max_iter=1000000)
 
 	def explore_action(self, state, action_space):
-		#return np.random.choice(range(0, action_space.n))
-		# Boltzmann exploration
 		q_values = self.evaluate_Q_values(state)[0]
 		ps = np.exp(q_values)
 		ps /= np.sum(ps)
-		action = np.random.choice(range(0, action_space.n), p=ps)
-		return action
+		return np.random.choice(range(0, action_space.n), p=ps)
 
 
 	def action_from_Q_values(self, q_values):

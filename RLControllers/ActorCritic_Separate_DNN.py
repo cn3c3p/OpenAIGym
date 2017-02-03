@@ -151,14 +151,6 @@ class ActorCriticDNN:
 			# ===== Let subclass to implement exploration ===== #
 			action = self.explore_action(action, action_space)
 
-		# Anneal exploration factor
-		self.actor_exploration = - (self.init_exp - 0.1) * self.iterations/self.max_iter  + self.init_exp
-		if self.actor_exploration < 0.1:
-			self.actor_exploration = 0.1
-		if self.iterations % 1000 == 0:
-			print('>>> Iterations: ', self.iterations)
-			print('>>> Exploration: ',self.actor_exploration)
-
 		action = self.prepare_action_for_env(action)
 		return action, under_exploration
 
@@ -174,6 +166,13 @@ class ActorCriticDNN:
 			self.critic_experiences.pop(0)
 
 		self.iterations += 1
+		# Anneal exploration factor
+		self.actor_exploration = - (self.init_exp - 0.1) * self.iterations / self.max_iter + self.init_exp
+		if self.actor_exploration < 0.1:
+			self.actor_exploration = 0.1
+		if self.iterations % 1000 == 0:
+			print('>>> Iterations: ', self.iterations)
+			print('>>> Exploration: ', self.actor_exploration)
 		if self.iterations % self.update_num == 0:
 			# Train the network
 			self.update_critic()
