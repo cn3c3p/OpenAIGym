@@ -63,17 +63,17 @@ if __name__ == '__main__':
 					print('Update everything!')
 					target_network.copy_params(update_network)
 			tick += 1
-			env.render()
-			action_space = env.action_space
 
+			action_space = env.action_space
 			if final_form or eval_mode:
+				env.render()
 				action = target_network.final_action(curr_obs)
 			else:
 				action, exploration = target_network.propose_action(curr_obs, action_space)
 			#action = env.action_space.sample()
 			next_obs, reward, done, info = env.step(action)
 			# Scale the reward..
-			reward /= 300
+			reward /= 200
 			cum_reward += reward
 			if done:
 				print('cum_reward = ', cum_reward)
@@ -85,9 +85,15 @@ if __name__ == '__main__':
 			#value = update_network.evaluate_state(curr_obs)
 			curr_obs = next_obs
 
-			if time.time() - start_time > 300:
-				# Stuckkkkkk
-				done = True
+			if time.time() - start_time > 90:
+				print('Stuck')
+				while not done:
+					action = 0
+					next_obs, reward, done, info = env.step(action)
+					update_network.add_experience_tuple(curr_obs, action, reward, next_obs, False)
+					curr_obs = next_obs
+			if cum_reward >= 200/200:
+				final_form = True
 
 		i_episode += 1
 		rewards.append(cum_reward)
@@ -96,7 +102,7 @@ if __name__ == '__main__':
 			rewards.pop(0)
 		print('rewards average: ', np.mean(rewards))
 
-		if np.mean(rewards) >= 480:
+		if np.mean(rewards) >= 200/200:
 			goal_reached = True
 
 		if cum_reward == 500.0:

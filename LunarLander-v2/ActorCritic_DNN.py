@@ -37,7 +37,7 @@ class ActorCriticDNN(module.ActorCriticDNN):
 				 num_action_output, num_features,
 				 mode='stochastic',
 				 actor_exploration = 0.9,
-				 update_num=5,
+				 update_num=10,
 				 batch_size=512,
 				 discount_factor=0.9,
 				 load_actor_model=None,
@@ -53,9 +53,9 @@ class ActorCriticDNN(module.ActorCriticDNN):
 									   	update_num=update_num,
 									   	batch_size=batch_size,
 									   	discount_factor=discount_factor,
-										actor_buffer_len = 15000,
-									   	critic_buffer_len = 30000,
-									   	max_iter=150000,
+										actor_buffer_len = 100000,
+									   	critic_buffer_len = 100000,
+									   	max_iter=500000,
 									   	load_actor_model=load_actor_model,
 									   	load_critic_model=load_critic_model)
 
