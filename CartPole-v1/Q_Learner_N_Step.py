@@ -43,8 +43,14 @@ class Network(module.Network):
 								discount_factor=0.9,
 								max_iter=80000)
 
-	def explore_action(self, action_space):
-		return np.random.choice(range(0, action_space.n))
+	def explore_action(self, state, action_space):
+		#return np.random.choice(range(0, action_space.n))
+		# Boltzmann exploration
+		q_values = self.evaluate_Q_values(state)[0]
+		ps = np.exp(q_values)
+		ps /= np.sum(ps)
+		action = np.random.choice(range(0, action_space), p=ps)
+
 
 	def action_from_Q_values(self, q_values):
 		return np.argmax(q_values)

@@ -80,7 +80,7 @@ class Network():
 		if p < self.exploration:
 			under_exploration = True
 			# ===== Let subclass to implement exploration ===== #
-			action = self.explore_action(action_space)
+			action = self.explore_action(s, action_space)
 		else:
 			Q_values = self.evaluate_Q_values(s)
 			action = self.action_from_Q_values(q_values=Q_values)
@@ -143,7 +143,7 @@ class Network():
 	def copy_params(self, other_network):
 		self.model.set_weights(other_network.model.get_weights())
 
-	def explore_action(self, action_space):
+	def explore_action(self, state, action_space):
 		# TODO: To be implemented by subclass
 		pass
 
