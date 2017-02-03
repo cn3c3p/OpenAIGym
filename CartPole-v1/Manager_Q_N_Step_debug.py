@@ -60,22 +60,24 @@ class Q_Worker():
 		return tick
 
 if __name__ == '__main__':
-	num_workers = 3
+	num_workers = 25
 	env = gym.make('CartPole-v1')
-	# env = wrappers.Monitor(env, './CartPole-v1-exp-Q-Learner', force=True)
+	env = wrappers.Monitor(env, './CartPole-v1-exp-Q-Learner_n_steps', force=True)
 	target_network = Q_Learner_N_Step.Network(
 		dense_layers=[128, 64, 32],
 		num_features=4,
 		num_actions=2,
-		global_model=None,
 		exploration=0.0,
 		max_steps=1,
+		target_model=None,
+
+
 	)
 	global_network = Q_Learner_N_Step.Network(
 		dense_layers=[128, 64, 32],
 		num_features=4,
 		num_actions=2,
-		global_model=None,
+		target_model=None,
 		exploration=0.0,
 		max_steps=1
 	)
@@ -86,7 +88,7 @@ if __name__ == '__main__':
 			dense_layers=[128, 64, 32],
 			num_features=4,
 			num_actions=2,
-			global_model=global_network,
+			target_model=global_network,
 			exploration=np.random.random_sample() * 0.6 + 0.4,
 			max_steps=32,
 		)
@@ -124,6 +126,37 @@ if __name__ == '__main__':
 		plt.scatter(x=i_episode, y=cum_reward, c='b', alpha=0.6)
 		plt.pause(0.01)
 
-		if cum_reward >= 480:
+		if cum_reward >= 500:
 			goal_reached = True
+
+	plt.ion()
+	plt.figure(2)
+	plt.subplot(211)
+	plt.title('Cumulative Reward')
+	plt.subplot(212)
+	plt.title('100 Average rewards')
+	# ======== Run Target network
+	rewards = [0]
+	i_episode = 0
+	while len(rewards) < 120 or np.mean(rewards) <= 500:
+		curr_obs = env.reset()
+		done = False
+
+		cum_reward = 0
+		while not done:
+			env.render()
+			action = target_network.final_action(curr_obs)
+			next_obs, reward, done, info = env.step(action)
+			cum_reward += reward
+			curr_obs = next_obs
+			cum_reward += reward
+		i_episode += 1
+		rewards.append(cum_reward)
+		if len(rewards) > 120:
+			rewards.pop(0)
+		plt.subplot(211)
+		plt.scatter(x=i_episode, y=cum_reward, c='b', alpha=0.6)
+		plt.subplot(212)
+		plt.scatter(x=i_episode, y=np.mean(rewards), c='r')
+		plt.pause(0.01)
 	plt.waitforbuttonpress()

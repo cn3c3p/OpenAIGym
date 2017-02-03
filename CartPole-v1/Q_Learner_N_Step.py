@@ -38,7 +38,7 @@ class Network(module.Network):
 								num_actions,
 								exploration=exploration,
 								max_steps=max_steps,
-								target_network=target_model,
+								target_model=target_model,
 								activation='linear',
 								loss='mse',
 								discount_factor=0.9,
