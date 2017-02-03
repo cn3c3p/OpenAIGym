@@ -144,7 +144,7 @@ class Network():
 		self.model.set_weights(other_network.model.get_weights())
 
 	def update_grads(self, gradients):
-		
+
 
 	def explore_action(self, action_space):
 		# TODO: To be implemented by subclass

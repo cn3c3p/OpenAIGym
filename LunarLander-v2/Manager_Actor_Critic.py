@@ -13,7 +13,7 @@ import ActorCritic_DNN as ac
 
 if __name__ == '__main__':
 	env = gym.make('LunarLander-v2')
-	#env = wrappers.Monitor(env, './LunarLander-v2-exp-Actor-Critic', force=True)
+	env = wrappers.Monitor(env, './LunarLander-v2-exp-Actor-Critic', force=True)
 	target_network = ac.ActorCriticDNN(
 		actor_layers=[128, 64, 32],
 		critic_layers=[128, 64, 32],
@@ -31,6 +31,8 @@ if __name__ == '__main__':
 		# load_actor_model='actor/actor-226.h5',
 		# load_critic_model='critic/critic-226.h5'
 	)
+
+	target_network.mode = 'stochastic'
 
 	tick = 1
 
@@ -60,7 +62,9 @@ if __name__ == '__main__':
 			if i_episode % 50 == 0:
 				print('EVALUATION MODE ~~~~~~~~~')
 				eval_mode = True
+				target_network.mode = 'max'
 			else:
+				target_network.mode = 'stochastic'
 				eval_mode = False
 
 			if tick % 150 == 0:
@@ -68,10 +72,12 @@ if __name__ == '__main__':
 					print('Update everything!')
 					target_network.copy_params(update_network)
 			tick += 1
-			env.render()
 			action_space = env.action_space
 
+			#env.render()
+
 			if final_form or eval_mode:
+				env.render()
 				action = target_network.final_action(curr_obs)
 			else:
 				action, exploration = target_network.propose_action(curr_obs, action_space)
@@ -84,13 +90,18 @@ if __name__ == '__main__':
 
 			if done:
 				print('cum_reward = ', cum_reward)
+			if cum_reward >= 200/100:
+				final_form = True
 			# Add experience
+			if eval_mode and not final_form:
+				update_network.add_experience_tuple(curr_obs, action, reward, next_obs, False)
 			if not final_form and not eval_mode:
 				update_network.add_experience_tuple(curr_obs, action, reward, next_obs, exploration)
 
+
 			#value = update_network.evaluate_state(curr_obs)
 			curr_obs = next_obs
-			if time.time() - start_time > 60:
+			if time.time() - start_time > 90:
 				print('Stuck')
 				while not done:
 					action = 0
