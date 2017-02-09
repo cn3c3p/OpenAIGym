@@ -84,7 +84,7 @@ class Network():
 		if p < self.exploration:
 			under_exploration = True
 			# ===== Let subclass to implement exploration ===== #
-			action = target_network.explore_action(action_space)
+			action = target_network.explore_action(s, action_space)
 		else:
 			Q_values = target_network.evaluate_Q_values(s)
 			action = target_network.action_from_Q_values(q_values=Q_values)
@@ -177,14 +177,12 @@ class Network():
 		self.model.set_weights(other_network.model.get_weights())
 
 	def train_with_batch(self, collective_inputs, collective_targets):
-
 		self.model.train_on_batch(
 			x=np.asarray(collective_inputs),
 			y=np.asarray(collective_targets)
 		)
 
-
-	def explore_action(self, action_space):
+	def explore_action(self, state, action_space):
 		# TODO: To be implemented by subclass
 		pass
 

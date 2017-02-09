@@ -16,9 +16,9 @@ os.environ['GOTO_NUM_THREADS'] = '4'
 import theano
 theano.config.openmp = True
 
-
 # Append path to ffmpeg binary
-os.environ['PATH'] += os.pathsep + '/usr/local/bin'
+#os.environ['PATH'] += os.pathsep + '/usr/local/bin'
+os.environ['PATH'] += os.pathsep + 'C:\\Users\\Hooligan\\ffmpeg-20170202-08b0981-win64-static\\bin'
 
 import Q_Learner_N_Step
 

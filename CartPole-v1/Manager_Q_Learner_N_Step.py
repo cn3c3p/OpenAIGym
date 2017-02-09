@@ -24,6 +24,7 @@ import Q_Learner_N_Step
 
 global_count = 1
 
+
 class Q_worker_thread(threading.Thread):
 
 	def __init__(self, threadID, update_network, target_network, target_lock, target_num):
@@ -67,8 +68,45 @@ class Q_worker_thread(threading.Thread):
 	def terminate(self):
 		self._stop.set()
 
+
+class Q_n_worker():
+
+	def __init__(self, model, target_network, target_num, id):
+		self.model = model
+		self.env = gym.make('CartPole-v1')
+		self.target_network = target_network
+		self.tick = 0
+		self.target_num = target_num
+		self.id = id
+
+	def run(self):
+		done = False
+		cum_reward = 0
+		curr_obs = env.reset()
+		while not done:
+
+			action_space = env.action_space
+			action, exploration = self.model.propose_action(curr_obs, action_space)
+			next_obs, reward, done, info = env.step(action)
+			cum_reward += reward
+			if done:
+				# print('threadId: ', self.threadId, 'cum_reward = ', cum_reward)
+				if cum_reward < 500:
+					reward = -1
+				else:
+					done = True
+			self.model.add_experience(curr_obs, action, reward, next_obs, done)
+			self.tick += 1
+			if self.tick % self.target_num == 0:
+				print('worker id: ', self.id)
+				self.target_network.copy_params(self.model)
+				global global_count
+				global_count += 1
+				print ('Global Count: ', global_count)
+
+
 if __name__ == '__main__':
-	num_workers = 3
+	num_workers = 5
 	env = gym.make('CartPole-v1')
 	#env = wrappers.Monitor(env, './CartPole-v1-exp-Q-Learner', force=True)
 	target_network = Q_Learner_N_Step.Network(
@@ -79,22 +117,19 @@ if __name__ == '__main__':
 		max_steps=1
 	)
 	# Make async Q networks
-	thread_workers = list()
-	target_lock = threading.Lock()
+	workers = list()
+	#target_lock = threading.Lock()
 	for i in range(0, num_workers):
 		update_network = Q_Learner_N_Step.Network(
-			dense_layers=[128,64,32],
+			dense_layers=[128, 64, 32],
 			num_features=4,
 			num_actions=2,
 			exploration=np.random.random_sample()*0.6 + 0.4,
-			max_steps=32,
-		)
-		thread_workers.append(
-			Q_worker_thread(i, update_network, target_network, target_lock, 150)
+			max_steps=64,
 		)
 
-	for thread in thread_workers:
-		thread.start()
+		worker = Q_n_worker(update_network, target_network, 300, i)
+		workers.append(worker)
 
 	plt.ion()
 	plt.figure(1)
@@ -106,9 +141,8 @@ if __name__ == '__main__':
 	i_episode = 0
 	while not goal_reached:
 		cum_reward = 0
-		target_lock.acquire()
-		#print('Main Thread checking global')
-		if global_count % 25 == 0:
+
+		if global_count > 25:
 			done = False
 			curr_obs = env.reset()
 			while not done:
@@ -117,24 +151,21 @@ if __name__ == '__main__':
 				next_obs, reward, done, info = env.step(action)
 				cum_reward += reward
 				curr_obs = next_obs
-
+				if cum_reward >= 480:
+					done = True
+					goal_reached = True
+			global_count = 0
 			i_episode += 1
-
 			plt.subplot(111)
 			plt.scatter(x=i_episode, y=cum_reward, c='b', alpha=0.6)
 			plt.pause(0.01)
 
-			if cum_reward >= 480:
-				goal_reached = True
-		target_lock.release()
-	plt.waitforbuttonpress()
-	# Goal has been reached..
-	# Stop the threads
-	for thread in thread_workers:
-		thread.terminate()
+		else:
+			for worker in workers:
+				worker.run()
 
-	# Evaluate the main thread.
-	rewards = list()
+	#=======> Evaluate the main thread. <=======#
+	rewards = [0]
 	i_episode = 0
 
 	plt.ion()
