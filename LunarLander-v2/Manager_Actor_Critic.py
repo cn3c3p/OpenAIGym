@@ -106,6 +106,8 @@ if __name__ == '__main__':
 				while not done:
 					action = 0
 					next_obs, reward, done, info = env.step(action)
+					if done:
+						reward = -100
 					update_network.add_experience_tuple(curr_obs, action, reward, next_obs, False)
 					curr_obs = next_obs
 		i_episode += 1

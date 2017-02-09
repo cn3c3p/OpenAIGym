@@ -3,6 +3,9 @@ from keras.layers import Input
 from keras.layers.core import Dense, Dropout
 from keras.models import Model, Sequential, load_model
 
+from keras.regularizers import l2, activity_l2
+
+
 import math
 import numpy as np
 from random import shuffle
@@ -71,11 +74,6 @@ class ActorCriticDNN:
 					Dense(
 						output_dim=critic_layer,
 						activation='relu'
-					)
-				)
-				self.critic.add(
-					Dropout(
-						p=0.1
 					)
 				)
 
