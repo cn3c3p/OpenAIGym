@@ -64,6 +64,7 @@ if __name__ == '__main__':
 					target_network.copy_params(update_network)
 			tick += 1
 
+
 			action_space = env.action_space
 			if final_form or eval_mode:
 				env.render()
@@ -90,7 +91,7 @@ if __name__ == '__main__':
 				while not done:
 					action = 0
 					next_obs, reward, done, info = env.step(action)
-					update_network.add_experience_tuple(curr_obs, action, reward, next_obs, False)
+					update_network.add_experience(curr_obs, action, reward, next_obs, False)
 					curr_obs = next_obs
 			if cum_reward >= 200/200:
 				final_form = True

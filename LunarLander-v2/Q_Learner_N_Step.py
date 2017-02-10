@@ -42,7 +42,7 @@ class Network(module.Network):
 								activation='linear',
 								loss='mse',
 								discount_factor=0.9,
-								max_iter=80000)
+								max_iter=800000)
 
 	def explore_action(self, state, action_space):
 		#return np.random.choice(range(0, action_space.n))
