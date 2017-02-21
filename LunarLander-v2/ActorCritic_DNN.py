@@ -38,7 +38,7 @@ class ActorCriticDNN(module.ActorCriticDNN):
 				 mode='stochastic',
 				 actor_exploration = 0.9,
 				 update_num=10,
-				 batch_size=512,
+				 batch_size=824,
 				 discount_factor=0.9,
 				 load_actor_model=None,
 				 load_critic_model=None):
@@ -49,13 +49,14 @@ class ActorCriticDNN(module.ActorCriticDNN):
 									   	num_features,
 									   	actor_loss='categorical_crossentropy',
 									   	actor_activation='softmax',
+									   	learning_rate=0.007,
 									   	actor_exploration=actor_exploration,
 									   	update_num=update_num,
 									   	batch_size=batch_size,
 									   	discount_factor=discount_factor,
-										actor_buffer_len = 10000,
-									   	critic_buffer_len = 10000,
-									   	max_iter=500000,
+										actor_buffer_len = 30000,
+									   	critic_buffer_len = 30000,
+									   	max_iter=5000000,
 									   	load_actor_model=load_actor_model,
 									   	load_critic_model=load_critic_model)
 

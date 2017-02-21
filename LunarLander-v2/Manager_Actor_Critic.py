@@ -106,15 +106,13 @@ if __name__ == '__main__':
 				while not done:
 					action = 0
 					next_obs, reward, done, info = env.step(action)
-					if done:
-						reward = -100
 					update_network.add_experience_tuple(curr_obs, action, reward, next_obs, False)
 					curr_obs = next_obs
 		i_episode += 1
 		rewards.append(cum_reward)
 
 		if i_episode % 100 == 0:
-			target_network.save('Actor-Critic-' + str(i_episode))
+			target_network.save(str(i_episode))
 			max_avg_reward = np.mean(rewards)
 
 		if len(rewards) > 100:

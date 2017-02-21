@@ -2,6 +2,7 @@ import time
 from keras.layers import Input
 from keras.layers.core import Dense, Dropout
 from keras.models import Model, Sequential
+from keras.optimizers import rmsprop
 
 import math
 import numpy as np
@@ -19,6 +20,7 @@ class Network():
 				 num_actions,
 				 activation='linear',
 				 loss='mse',
+				 learning_rate=0.001,
 				 update_num=10,
 				 batch_size=32,
 				 discount_factor=0.9,
@@ -35,6 +37,7 @@ class Network():
 		self.iterations = 0
 		self.experiences = list()
 		self.experience_length = experience_length
+
 
 		self.model = Sequential()
 
@@ -61,7 +64,7 @@ class Network():
 		)
 
 		self.model.compile(
-			optimizer='rmsprop',
+			optimizer=rmsprop(lr=learning_rate),
 			loss=loss
 		)
 
@@ -158,6 +161,9 @@ class Network():
 	def final_action(self, s):
 		q_values = self.evaluate_Q_values(s)
 		return self.action_from_Q_values(q_values)
+
+	def save(self, name):
+		self.model.save('Q_learning/model' + str(name) + '.h5')
 
 	def copy_params(self, network):
 		self.model.set_weights(network.model.get_weights())
