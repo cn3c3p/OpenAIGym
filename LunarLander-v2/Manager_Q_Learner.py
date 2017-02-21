@@ -16,13 +16,13 @@ if __name__ == '__main__':
 	env = gym.make('LunarLander-v2')
 	#env = wrappers.Monitor(env, './LunarLander-v2-exp-Q-Learner', force=True)
 	target_network = Q_Learner.Network(
-		dense_layers=[128,64,32],
+		dense_layers=[300],
 		num_features=8,
 		num_actions=4
 	)
 
 	update_network = Q_Learner.Network(
-		dense_layers=[128,64,32],
+		dense_layers=[300],
 		num_features=8,
 		num_actions=4
 	)
@@ -58,7 +58,7 @@ if __name__ == '__main__':
 			else:
 				eval_mode = False
 
-			if tick % 300 == 0:
+			if tick % 1000 == 0:
 				if not final_form:
 					print('Update everything!')
 					target_network.copy_params(update_network)
@@ -105,7 +105,7 @@ if __name__ == '__main__':
 		if np.mean(rewards) >= 200/200:
 			goal_reached = True
 
-		if cum_reward == 500.0:
+		if cum_reward == 2.0:
 			print('Final Form')
 			final_form = True
 			target_network.mode = 'max'

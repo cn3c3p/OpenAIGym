@@ -36,7 +36,7 @@ class Network(module.Network):
 								dense_layers,
 								num_features,
 								num_actions,
-								activation='linear',
+								activation='softmax',
 								loss='mse',
 								update_num=10,
 								batch_size=512,
