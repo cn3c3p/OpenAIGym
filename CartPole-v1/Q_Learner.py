@@ -45,7 +45,7 @@ class Network(module.Network):
 								experience_length=3000,
 								max_iter=80000)
 
-	def explore_action(self, action_space):
+	def explore_action(self, state, action_space):
 		return np.random.choice(range(0, action_space.n))
 
 	def action_from_Q_values(self, q_values):
