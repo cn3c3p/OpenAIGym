@@ -101,13 +101,13 @@ if __name__ == '__main__':
 
 			#value = update_network.evaluate_state(curr_obs)
 			curr_obs = next_obs
-			if time.time() - start_time > 90:
+			if time.time() - start_time > 30:
 				print('Stuck')
 				while not done:
 					action = 0
 					next_obs, reward, done, info = env.step(action)
 					if done:
-						reward = -100
+						reward = -1
 					update_network.add_experience_tuple(curr_obs, action, reward, next_obs, False)
 					curr_obs = next_obs
 		i_episode += 1
