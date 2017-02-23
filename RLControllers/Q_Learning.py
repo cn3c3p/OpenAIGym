@@ -55,11 +55,6 @@ class Network():
 					activation='relu'
 				)
 			)
-			self.model.add(
-				Dropout(
-					p=0.2
-				)
-			)
 
 		self.model.add(
 			Dense(
