@@ -13,21 +13,21 @@ import Dueling_Q_Learner
 
 if __name__ == '__main__':
 
-	env = gym.make('CartPole-v1')
-	env = wrappers.Monitor(env, './CartPole-v1-exp-Duel-Q', force=True)
+	env = gym.make('LunarLander-v2')
+	env = wrappers.Monitor(env, './Dueling_Q_Learning', force=True)
 	target_network = Dueling_Q_Learner.network(
-		adv_layers=[128, 128],
-		val_layers=[128, 128],
-		num_features=4,
-		num_actions=2,
+		adv_layers=[200, 128, 64],
+		val_layers=[200, 128, 64],
+		num_features=8,
+		num_actions=4,
 		learning_rate=0.0005
 	)
 
 	update_network = Dueling_Q_Learner.network(
-		adv_layers=[128, 128],
-		val_layers=[128, 128],
-		num_features=4,
-		num_actions=2,
+		adv_layers=[200, 128, 64],
+		val_layers=[200, 128, 64],
+		num_features=8,
+		num_actions=4,
 		learning_rate=0.0005
 	)
 
@@ -77,12 +77,10 @@ if __name__ == '__main__':
 			# action = env.action_space.sample()
 			next_obs, reward, done, info = env.step(action)
 
+			reward /= 150
+
 			cum_reward += reward
 
-			if done:
-				print('cum_reward = ', cum_reward)
-				if cum_reward <= 500:
-					reward = -1
 			# Add experience
 			if not final_form and not eval_mode:
 				update_network.add_experience(curr_obs, action, reward, next_obs, done, target_network)
@@ -96,10 +94,10 @@ if __name__ == '__main__':
 			rewards.pop(0)
 		print('rewards average: ', np.mean(rewards))
 
-		if np.mean(rewards) >= 500:
+		if np.mean(rewards) >= 1.5:
 			goal_reached = True
 
-		if np.mean(rewards) >= 410.0:
+		if np.mean(rewards) >= 1.0:
 			print('Final Form')
 			final_form = True
 			target_network.mode = 'max'

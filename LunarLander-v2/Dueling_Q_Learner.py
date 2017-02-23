@@ -56,8 +56,11 @@ class network(module.Dueling_Q_Network):
 
 	def explore_action(self, state, action_space):
 		# Boltzmann Exploration..
+		q_values = self.evaluate_q_values(state)[0]
+		ps = np.exp(q_values)
+		ps /= np.sum(ps)
 
-		return np.random.choice(range(0, action_space.n))
+		return np.random.choice(range(0, action_space.n), p=ps)
 
 	def action_from_Q_values(self, q_values):
 		return np.argmax(q_values)

@@ -2,7 +2,7 @@ import time
 from keras.layers import Input
 from keras.layers.core import Dense, Dropout
 from keras.models import Model, Sequential
-from keras.optimizers import rmsprop
+from keras.optimizers import rmsprop, Adam
 
 import math
 import numpy as np
@@ -64,7 +64,7 @@ class Network():
 		)
 
 		self.model.compile(
-			optimizer=rmsprop(lr=learning_rate),
+			optimizer=Adam(lr=learning_rate),
 			loss=loss
 		)
 
@@ -105,7 +105,7 @@ class Network():
 
 		if self.iterations % self.update_num == 0:
 			# Train the network
-			for i in range(0, 10):
+			for i in range(0, 1):
 				self.update()
 
 	def update(self):

@@ -1,13 +1,15 @@
 # Setup
-title:        Project or Site name
-tagline:      A responsive theme for your project on GitHub Pages
-baseurl:      ""
+title:        OpenAI Gym projects
+tagline:      A place where I implement and test RL algorithms in OpenAI environments
+baseurl:
 paginate:     1
+repository:   jchen114/OpenAIGym
+markdown:     redcarpet
 
 # About/contact
 author:
-  name:       Author name
-  url:        http://yourhomepage.com 
+  name:       Jacob Chen
+  url:        http://chenjacob.com
 
 # Gems
 gems:

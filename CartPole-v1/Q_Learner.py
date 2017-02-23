@@ -38,12 +38,13 @@ class Network(module.Network):
 								num_actions,
 								activation='linear',
 								loss='mse',
-								update_num=10,
-								batch_size=320,
+								learning_rate=0.0005,
+								update_num=15,
+								batch_size=512,
 								discount_factor=0.9,
 								exploration=1.0,
-								experience_length=3000,
-								max_iter=80000)
+								experience_length=10000,
+								max_iter=15000)
 
 	def explore_action(self, state, action_space):
 		return np.random.choice(range(0, action_space.n))
