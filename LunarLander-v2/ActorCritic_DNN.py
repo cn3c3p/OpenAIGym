@@ -49,13 +49,14 @@ class ActorCriticDNN(module.ActorCriticDNN):
 									   	num_features,
 									   	actor_loss='categorical_crossentropy',
 									   	actor_activation='softmax',
+									   	learning_rate=0.007,
 									   	actor_exploration=actor_exploration,
 									   	update_num=update_num,
 									   	batch_size=batch_size,
 									   	discount_factor=discount_factor,
-										actor_buffer_len = 10000,
-									   	critic_buffer_len = 10000,
-									   	max_iter=1000000,
+										actor_buffer_len = 30000,
+									   	critic_buffer_len = 30000,
+									   	max_iter=5000000,
 									   	load_actor_model=load_actor_model,
 									   	load_critic_model=load_critic_model)
 

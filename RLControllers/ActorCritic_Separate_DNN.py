@@ -2,6 +2,7 @@ import time
 from keras.layers import Input
 from keras.layers.core import Dense, Dropout
 from keras.models import Model, Sequential, load_model
+from keras.optimizers import rmsprop
 
 from keras.regularizers import l2, activity_l2
 
@@ -30,6 +31,7 @@ class ActorCriticDNN:
 				 actor_loss='mse',
 				 critic_activation='linear',
 				 actor_activation='linear',
+				 learning_rate = 0.001,
 				 actor_exploration = 0.9,
 				 update_num=32,
 				 batch_size=32,
@@ -86,7 +88,7 @@ class ActorCriticDNN:
 			)
 
 			self.critic.compile(
-				optimizer='rmsprop',
+				optimizer=rmsprop(lr=learning_rate),
 				loss=critic_loss
 			)
 
@@ -119,7 +121,7 @@ class ActorCriticDNN:
 			)
 
 			self.actor.compile(
-				optimizer='rmsprop',
+				optimizer=rmsprop(lr=learning_rate),
 				loss=actor_loss
 			)
 

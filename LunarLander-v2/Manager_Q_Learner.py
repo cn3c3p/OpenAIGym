@@ -64,6 +64,7 @@ if __name__ == '__main__':
 					target_network.copy_params(update_network)
 			tick += 1
 
+
 			action_space = env.action_space
 			if final_form or eval_mode:
 				env.render()
@@ -90,22 +91,25 @@ if __name__ == '__main__':
 				while not done:
 					action = 0
 					next_obs, reward, done, info = env.step(action)
-					update_network.add_experience_tuple(curr_obs, action, reward, next_obs, False)
+					update_network.add_experience(curr_obs, action, reward, next_obs, False)
 					curr_obs = next_obs
-			if cum_reward >= 200/200:
+			if cum_reward >= 1:
 				final_form = True
 
 		i_episode += 1
 		rewards.append(cum_reward)
 
+		if i_episode % 100 == 0:
+			target_network.save(i_episode)
+
 		if len(rewards) > 100:
 			rewards.pop(0)
 		print('rewards average: ', np.mean(rewards))
 
-		if np.mean(rewards) >= 200/200:
+		if np.mean(rewards) >= 2:
 			goal_reached = True
 
-		if cum_reward == 500.0:
+		if cum_reward == 2.0:
 			print('Final Form')
 			final_form = True
 			target_network.mode = 'max'
