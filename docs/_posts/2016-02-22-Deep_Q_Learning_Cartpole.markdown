@@ -7,7 +7,7 @@ categories: main
 
 # Deep Q Learning with Cartpole-v1
 
-<iframe width="420" height="315" src="{{site.url}}/assets/Q_Learning_Cartpole_v1.mov" frameborder="0" align="right"></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/g1tkRsO5NiY" frameborder="0" align="right" allowfullscreen></iframe>
 
 ## Q Learning
 The goal of the agent is to maximize the cumulative rewards it sees. One way to do this is by using something called a Q function. Using a Q function, we can directly go from states to actions. Our policy would then be selecting the action with the greatest value at any given state. The Q function denoted as \\( Q(s,a)  \\) gives the value of taking a discrete action a at some state s. In order to update the Q function,
