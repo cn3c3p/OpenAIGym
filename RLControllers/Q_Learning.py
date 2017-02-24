@@ -25,6 +25,7 @@ class Network():
 				 batch_size=32,
 				 discount_factor=0.9,
 				 exploration=1.0,
+				 end_exploration=0.1,
 				 experience_length=50000,
 				 max_iter=100000):
 
@@ -33,16 +34,16 @@ class Network():
 		self.discount_factor = discount_factor
 		self.init_exp = exploration
 		self.exploration = exploration
+		self.end_exploration = end_exploration
 		self.max_iter = max_iter
 		self.iterations = 0
 		self.experiences = list()
 		self.experience_length = experience_length
 
-
 		self.model = Sequential()
 
 		self.model.add(
-			Dense (
+			Dense(
 				output_dim=dense_layers[0],
 				input_dim=num_features
 			)
@@ -55,6 +56,11 @@ class Network():
 					activation='relu'
 				)
 			)
+			self.model.add(
+				Dropout(
+					p=0.2
+				)
+			)
 
 		self.model.add(
 			Dense(
@@ -64,7 +70,7 @@ class Network():
 		)
 
 		self.model.compile(
-			optimizer=Adam(lr=learning_rate),
+			optimizer=rmsprop(lr=learning_rate),
 			loss=loss
 		)
 
@@ -85,17 +91,16 @@ class Network():
 			# ===== Let subclass to implement exploration ===== #
 			action = self.explore_action(s, action_space)
 		else:
-			Q_values = self.evaluate_Q_values(s)
-			action = self.action_from_Q_values(q_values=Q_values)
+			self.final_action(s)
 		return action, under_exploration
 
 	def add_experience(self, s, a, r, s_n, done):
 		self.experiences.append((s, a, r, s_n, done))
 		self.iterations += 1
 		# Anneal exploration factor
-		self.exploration = - (self.init_exp - 0.1) * self.iterations / self.max_iter + self.init_exp
-		if self.exploration < 0.1:
-			self.exploration = 0.1
+		self.exploration = - (self.init_exp - self.end_exploration) * self.iterations / self.max_iter + self.init_exp
+		if self.exploration < self.end_exploration:
+			self.exploration = self.end_exploration
 		if len(self.experiences) > self.experience_length:
 			self.experiences.pop(0)
 
@@ -105,7 +110,7 @@ class Network():
 
 		if self.iterations % self.update_num == 0:
 			# Train the network
-			for i in range(0, 1):
+			for i in range(0, 5):
 				self.update()
 
 	def update(self):

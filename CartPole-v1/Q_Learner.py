@@ -31,6 +31,8 @@ else:
 
 class Network(module.Network):
 
+	mode = 'stochastic'
+
 	def __init__(self, dense_layers, num_features, num_actions):
 		module.Network.__init__(self,
 								dense_layers,
@@ -38,13 +40,14 @@ class Network(module.Network):
 								num_actions,
 								activation='linear',
 								loss='mse',
-								learning_rate=0.0005,
-								update_num=15,
-								batch_size=512,
-								discount_factor=0.9,
+								learning_rate=0.001,
+								update_num=5,
+								batch_size=250,
+								discount_factor=0.99,
 								exploration=1.0,
-								experience_length=10000,
-								max_iter=15000)
+								end_exploration=0.01,
+								experience_length=3000,
+								max_iter=30000)
 
 	def explore_action(self, state, action_space):
 		return np.random.choice(range(0, action_space.n))

@@ -16,13 +16,13 @@ if __name__ == '__main__':
 	env = gym.make('CartPole-v1')
 	env = wrappers.Monitor(env, './CartPole-v1-exp-Q-Learner', force=True)
 	target_network = Q_Learner.Network(
-		dense_layers=[128,64,32],
+		dense_layers=[128, 64, 32],
 		num_features=4,
 		num_actions=2
 	)
 
 	update_network = Q_Learner.Network(
-		dense_layers=[128,64,32],
+		dense_layers=[128, 64, 32],
 		num_features=4,
 		num_actions=2
 	)
@@ -57,7 +57,7 @@ if __name__ == '__main__':
 			else:
 				eval_mode = False
 
-			if tick % 150 == 0:
+			if tick % 300 == 0:
 				if not final_form:
 					print('Update everything!')
 					target_network.copy_params(update_network)
@@ -79,8 +79,7 @@ if __name__ == '__main__':
 				if cum_reward != 500:
 					reward = -1
 			# Add experience
-			if not final_form and not eval_mode:
-				update_network.add_experience(curr_obs, action, reward, next_obs, done)
+			update_network.add_experience(curr_obs, action, reward, next_obs, done)
 
 			#value = update_network.evaluate_state(curr_obs)
 			curr_obs = next_obs
@@ -94,15 +93,14 @@ if __name__ == '__main__':
 		if np.mean(rewards) >= 480:
 			goal_reached = True
 
-		if cum_reward == 500.0:
+		if cum_reward >= 500.0:
 			print('Final Form')
 			final_form = True
-			target_network.mode = 'max'
 
 		plt.subplot(211)
-		plt.scatter(x=i_episode, y=cum_reward, c='b', alpha=0.6)
+		plt.scatter(x=i_episode, y=cum_reward, c='b', alpha=0.3)
 		plt.subplot(212)
-		plt.scatter(x=i_episode, y=np.mean(rewards), c='b', alpha=0.6)
+		plt.scatter(x=i_episode, y=np.mean(rewards), c='b', alpha=0.3)
 		plt.pause(0.01)
 	plt.waitforbuttonpress()
 
