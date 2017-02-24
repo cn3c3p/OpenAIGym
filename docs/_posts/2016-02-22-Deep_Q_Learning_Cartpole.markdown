@@ -87,7 +87,7 @@ It is noted that having 2 separate networks for proposing an action and updating
 There is a limit of 500 reward points the environment allows you to have at each episode. I therefore set the reward to be -1 if the agent's episode finished without reaching 500. This would incentivize the agent to continue and avoid early termination.
 
 I evaluate the agent every 50 episodes to gauge its progress. Once the reward limit has been reached, I then allow the agent to make optimal actions every time until the environment is solved. A partial training graph looks like this:
-![Error graph]({{site.url}}/assets/Q_Learning_errors_Cartpole_v1.png)
+![Error graph](https://cloud.githubusercontent.com/assets/4509894/23288500/cdd90532-f9f8-11e6-84c2-0def8c5463ff.png)
 Notice that around every 50 episodes, there is a large cumulative reward spike. This is when the Q network evaluates itself to gauge its performance.
 
 Note: Adding dropout layers after the dense layer allowed for faster completion time. Dropout effectively acts as a regularizer because we are averaging across a variety of architectures.
