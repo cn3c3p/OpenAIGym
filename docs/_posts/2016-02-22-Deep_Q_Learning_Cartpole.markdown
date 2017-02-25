@@ -10,7 +10,6 @@ categories: main
 <iframe width="560" height="315" src="https://www.youtube.com/embed/g1tkRsO5NiY" frameborder="0" allowfullscreen></iframe>
 </div>
 
-
 ## Q Learning
 The goal of the agent is to maximize the cumulative rewards it sees. One way to do this is by using something called a Q function. Using a Q function, we can directly go from states to actions. Our policy would then be selecting the action with the greatest value at any given state. The Q function denoted as \\( Q(s,a)  \\) gives the value of taking a discrete action a at some state s. In order to update the Q function,
 we employ the update rule
@@ -18,6 +17,15 @@ we employ the update rule
 
 to iteratively update the function. This equation essentially tells us to use the current reward we receive from taking action a from s and then adding the
 next possible best state action value from state s' which we end up in after taking action a from s. Since we take the maximum value for our estimation, we are performing off policy learning since we are approximating the optimal Q function and therefore not care about any other action values.
+
+## Exploration
+
+In order to explore, I have the agent perform $$\epsilon$$-greedy exploration policy which with probability $$\epsilon$$ takes a random action from its current state. This probability gets annealed over time so that the agent takes the action that it thinks is best for its current state.
+
+It is noted that having 2 separate networks for proposing an action and updating provides more stability and less overestimation. Thus, I use one network for proposing an action and one for collecting the experience tuples and updating upon those tuples. Then after some fixed iteration, I then copy over the update network's parameters to the target network.
+
+There is a limit of 500 reward points the environment allows you to have at each episode. I therefore set the reward to be -1 if the agent's episode finished without reaching 500. This would incentivize the agent to continue and avoid early termination.
+
 ## Training
 In the cartpole problem, we are presented with a continuous state space with 2 discrete actions. In order to represent our Q function, we'll have to use a function
 approximator in order to give us a general idea about the values of similar states. In this case, we use a deep neural network which has 8 features as input and outputs the values of the 2 actions separately. Our Q function approximator is denoted as \\( Q(s,a, \theta) \\) where $$\theta$$ is the parameters of our model.
@@ -29,6 +37,12 @@ To minimize this loss function, the gradients are computed with respect to the p
 During the simulation, we collect tuples of $$(s,a,r,s')$$. These tuples are collected in an experience buffer that the algorithm selects batches from for training. A larger batch size results in a more stable gradient.
 
 Thus, in order to implement our update, we compute a forward pass from our current states s to receive $$Q(s,a)$$ for each action. We then do another forward pass from our next states s' to receive $$Q(s', a')$$ for each action in s'. Then we select the greatest value in s' in order to estimate the best possible value in s' with $$\max_{a'}Q(s',a')$$. So, in order to update the targets for $$Q(s,a)$$ we update the action value outputted from the network while keeping the other action values the same.
+
+I evaluate the agent every 50 episodes to gauge its progress. Once the reward limit has been reached, I then allow the agent to make optimal actions every time until the environment is solved. A partial training graph looks like this:
+![Error graph](https://cloud.githubusercontent.com/assets/4509894/23288500/cdd90532-f9f8-11e6-84c2-0def8c5463ff.png)
+Notice that around every 50 episodes, there is a large cumulative reward spike. This is when the Q network evaluates itself to gauge its performance.
+
+Note: Adding dropout layers after the dense layer allowed for faster completion time. Dropout effectively acts as a regularizer because we are averaging across a variety of architectures.
 
 In code, the implementation would look something like this:
 
@@ -78,19 +92,6 @@ def update(self):
   )
 {% endhighlight %}
 
-## Exploration and Beyond
-
-In order to explore, I have the agent perform $$\epsilon$$-greedy exploration policy which with probability $$\epsilon$$ takes a random action from its current state. This probability gets annealed over time so that the agent takes the action that it thinks is best for its current state.
-
-It is noted that having 2 separate networks for proposing an action and updating provides more stability and less overestimation. Thus, I use one network for proposing an action and one for collecting the experience tuples and updating upon those tuples. Then after some fixed iteration, I then copy over the update network's parameters to the target network.
-
-There is a limit of 500 reward points the environment allows you to have at each episode. I therefore set the reward to be -1 if the agent's episode finished without reaching 500. This would incentivize the agent to continue and avoid early termination.
-
-I evaluate the agent every 50 episodes to gauge its progress. Once the reward limit has been reached, I then allow the agent to make optimal actions every time until the environment is solved. A partial training graph looks like this:
-![Error graph](https://cloud.githubusercontent.com/assets/4509894/23288500/cdd90532-f9f8-11e6-84c2-0def8c5463ff.png)
-Notice that around every 50 episodes, there is a large cumulative reward spike. This is when the Q network evaluates itself to gauge its performance.
-
-Note: Adding dropout layers after the dense layer allowed for faster completion time. Dropout effectively acts as a regularizer because we are averaging across a variety of architectures.
 
 [OpenAI-gh]: https://github.com/jchen114/OpenAIGym
 [OpenAI]:    http://gym.openai.com
