@@ -6,7 +6,11 @@ categories: main
 ---
 
 # Actor Critic Learning for Cartpole V1
-Video
+
+<div class="center">
+<iframe width="560" height="315" src="https://youtu.be/1gyWjyHvPOA" frameborder="0" allowfullscreen></iframe>
+</div>
+
 ## Actor Critic method
 Actor Critic methods are a popular choice for on policy learning which combined a policy gradient update with a value function. Policy gradients are a way to modify your policy to go straight from a state to an action without the need of a value estimate. The critic critiques a state and estimates the value of a state. The actor proposes an action for the state. The actor uses the estimate from the critic to determine the direction to move its actions. This is done through something called a TD error expressed as
 \\[\delta_t = r_{t+1} + \gamma V(s_{t+1}) - V(s_t)\\]
@@ -115,4 +119,5 @@ def update_actor(self):
 {% endhighlight %}
 
 I evaluate the agent every 50 episodes to check its performance. Once the performance has reached the maximum goal, I then set the agent to take the most optimal action at its current state. An error graph looks like this:
-Graph
+
+![Error graph](https://cloud.githubusercontent.com/assets/4509894/23288500/cdd90532-f9f8-11e6-84c2-0def8c5463ff.png)
