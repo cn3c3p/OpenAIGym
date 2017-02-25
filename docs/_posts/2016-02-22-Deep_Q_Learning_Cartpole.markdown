@@ -1,7 +1,7 @@
 ---
 layout: default
 title:  "Deep Q Learning on Cartpole V1"
-date:   2016-02-12 17:50:00
+date:   2017-02-22 17:50:00
 categories: main
 ---
 

@@ -1,14 +1,14 @@
 ---
 layout: default
 title:  "Actor Critic Learning on Cartpole V1"
-date:   2016-02-12 17:50:00
+date:   2017-02-23 17:50:00
 categories: main
 ---
 
 # Actor Critic Learning for Cartpole V1
 
 <div class="center">
-<iframe width="560" height="315" src="https://youtu.be/1gyWjyHvPOA" frameborder="0" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/1gyWjyHvPOA" frameborder="0" allowfullscreen></iframe>
 </div>
 
 ## Actor Critic method
