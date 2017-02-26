@@ -28,7 +28,7 @@ We can substitute this result into $$\nabla J(\theta)$$ to obtain:
 The idea is that we can then replace our instantaneous reward function $$R(s,a)$$ with a long term state action value function $$Q^\pi(s,a)$$ and try to maximize $$J(\theta)$$. Now, just using $$Q(s,a)$$ doesn't tell you how good an action is with respect to the other actions you can take at your current state. So, a natural extension is to average the values of the actions taken at the state and compare your current action with the average. The average function is nothing but the value function $$V(s)$$. Thus, we define the advantage function as $$A(s,a) = Q(s,a) - V(s)$$. If we plug this into our new formula for $$J(\theta)$$, we get:
 \\[J'(\theta) = \mathop{\mathbb{E}}[A(s,a)]\\]
 \\[=\mathop{\mathbb{E}}[Q(s,a) - V(s)]\\]
-$$=\mathop{\mathbb{E}}[Q(s,a)] - \mathop{\mathbb{E}}[V(s)]$$
+\\[=\mathop{\mathbb{E}}[Q(s,a)] - \mathop{\mathbb{E}}[V(s)]\\]
 
 The key insight here is that we can still use the exact same gradient in order to maximize this new function.
 \\[\nabla J'(\theta) = \sum_s^S d(s) \sum_a^A \nabla \pi^\theta(s,a)R(s,a) - \sum_s^S d(s) \sum_a^A \nabla \pi^\theta(s,a) V(s)\\]
