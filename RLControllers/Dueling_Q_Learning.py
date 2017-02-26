@@ -1,7 +1,8 @@
 from keras.models import Model, load_model
-from keras.layers import Input, Dense, merge, RepeatVector, Reshape
+from keras.layers import Input, Dense, merge, RepeatVector, Reshape, Dropout
 from keras.backend import repeat_elements, sum
 from keras.optimizers import rmsprop, Adam
+from keras.regularizers import l2, activity_l2
 
 import numpy as np
 
@@ -85,7 +86,11 @@ class Dueling_Q_Network():
 			for layer in adv_layers:
 				adv_layer = Dense(
 					output_dim=layer,
-					activation='relu'
+					activation='relu',
+					W_regularizer=l2(0.01)
+				)(adv_layer)
+				adv_layer = Dropout(
+					p=0.2
 				)(adv_layer)
 
 			# Advantage Output
@@ -98,7 +103,10 @@ class Dueling_Q_Network():
 			for layer in val_layers:
 				val_layer = Dense(
 					output_dim=layer,
-					activation='relu'
+					activation='relu',
+				)(val_layer)
+				val_layer = Dropout(
+					p=0.2
 				)(val_layer)
 			# Value Output
 			val_layer = Dense(
